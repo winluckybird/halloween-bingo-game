@@ -4,8 +4,18 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#211334">
-  <meta name="description" content="万圣节午夜糖果派对：经典数字 Bingo 与图案 Bingo，邀请好友一起连成两条线。">
-  <title>Halloween Bingo · 午夜糖果派对</title>
+  <meta name="description" content="免费在线玩 Halloween Bingo 万圣节宾果：支持 2–8 人好友房和单人练习，任选经典 1–75 数字或 24 种万圣图案。看开奖、自己找格、手动盖章，连成两条线即可争取获胜，无需下载。">
+  <meta name="robots" content="index,follow">
+  <title>Halloween Bingo 在线游戏｜万圣节宾果 · 好友联机与单人练习</title>
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="zh_CN">
+  <meta property="og:site_name" content="Halloween Bingo · 午夜糖果派对">
+  <meta property="og:title" content="Halloween Bingo 在线游戏｜万圣节午夜糖果派对">
+  <meta property="og:description" content="邀请 2–8 位朋友一起玩，或独自练习。经典数字与万圣图案两种玩法，自己找格、手动盖章，同轮达标一起赢。">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Halloween Bingo · 午夜糖果派对">
+  <meta name="twitter:description" content="免费浏览器 Bingo：好友联机、单人练习、数字与图案双模式。">
+  <!-- SITE_META -->
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🎃%3C/text%3E%3C/svg%3E">
   <link rel="stylesheet" href="/src/style.css">
 </head>
@@ -16,7 +26,23 @@
       <a href="/" class="brand" aria-label="Halloween Bingo 首页"><span class="brand-pumpkin">🎃</span><span>HALLOWEEN <b>BINGO</b><small>午夜糖果派对</small></span></a>
       <div class="top-actions"><button class="wallet" data-action="shop" aria-label="糖果装饰商店"><span>🍬</span><b id="wallet">0</b><small>糖果</small></button><button class="icon-button" data-action="help" aria-label="玩法说明">?</button><button class="icon-button" data-action="settings" aria-label="设置">⚙</button></div>
     </header>
-    <main id="app"><div class="loading">点亮南瓜灯，派对准备中…</div></main>
+    <main id="app"><section class="boot-intro ornate"><span class="eyebrow">THE MIDNIGHT CANDY PARTY</span><h1>Halloween Bingo 万圣节宾果在线游戏</h1><p>和 2–8 位朋友一起玩，或开启单人练习。选择经典数字或万圣图案，看开奖、自己找格、手动盖章，连成两条线。</p><p class="loading-message" role="status">点亮南瓜灯，派对准备中…</p><a class="text-button" href="#game-guide">先了解玩法 ↓</a></section></main>
+    <section id="game-guide" class="game-guide" aria-labelledby="guide-title">
+      <div class="guide-heading"><span class="eyebrow">A LITTLE GUIDE TO YOUR PARTY</span><h2 id="guide-title">万圣节 Bingo，和朋友一起连出好运</h2><p>午夜糖果派对是一款免费的浏览器宾果小游戏，无需下载。通过房间码或邀请链接加入朋友房，也可以独自练习；每位玩家都要自己找格、手动盖章。</p></div>
+      <div class="guide-modes">
+        <article class="ornate guide-card"><span class="eyebrow">CLASSIC NUMBERS</span><h3>经典 1–75 数字 Bingo</h3><p>保留熟悉的数字球。5×5 卡片按 B/I/N/G/O 分列，每张卡包含 24 个不同号码和中心免费格，公共开奖从 1–75 中不放回抽取。</p><small>最多 75 轮 · 最长 8 分 57 秒</small></article>
+        <article class="ornate guide-card"><span class="eyebrow">HALLOWEEN ICONS</span><h3>24 种万圣图案 Bingo</h3><p>幽灵、蝙蝠、黑猫、女巫帽和糖果组成可爱的万圣节卡片。所有玩家拥有相同的 24 种图案，位置随机不同，中心南瓜灯为免费格。</p><small>最多 24 轮 · 最长 3 分钟</small></article>
+      </div>
+      <div class="ornate guide-rules"><h3>怎么玩？看开奖 → 找格盖章 → 连成两条线</h3><ol><li><strong>看开奖：</strong>开局倒数 3 秒，每轮公布一个号码或图案，提供 7 秒操作时间。</li><li><strong>找格盖章：</strong>自己找到卡片上对应的格子并点击。只有 FREE 自动点亮；历史已开奖项目可以在后续正常轮补点。</li><li><strong>连成两条线：</strong>任意行、列或两条主对角线完整点亮即可连线，至少两条不同连线达标。轮末统一判定，同轮达标的玩家并列获胜。</li></ol><p>第 6、12、18 轮末若无人获胜，会出现 3 秒万圣节趣味事件。事件期间暂不能标记，下一轮仍有完整 7 秒；直到最终轮仍无人达标，则本局无人获胜。</p></div>
+      <div class="guide-faq"><h3>开始派对前，你可能想知道</h3>
+        <details><summary>需要下载或注册账号吗？</summary><p>无需下载，使用浏览器即可游玩。设置昵称和预设头像后创建朋友房，或输入房间码加入；身份保存在当前浏览器。</p></details>
+        <details><summary>可以几个人玩？手机和电脑能一起玩吗？</summary><p>朋友房支持 2–8 人，也有单人练习。手机竖屏和电脑横屏使用同样的规则，所有参与者需要能访问同一个游戏服务器。</p></details>
+        <details><summary>开奖后会自动帮我标记吗？</summary><p>不会。除了中心 FREE，每一格都需要你自己找到并点击，收到确认后才会盖章。误点尚未开奖的格子不会扣分，漏点可以查历史再补。</p></details>
+        <details><summary>两个人在同一轮达标，谁赢？</summary><p>都赢。每轮结束时统一检查胜负，在最早出现达标玩家的轮次中，所有达到至少两条线的参赛者并列获胜，不比较点击先后。</p></details>
+        <details><summary>糖果或付费道具会影响胜率吗？</summary><p>不会。糖果只用于头像、卡框和获胜动画等装饰；没有自动补点、重抽或窥视后续开奖等影响结果的道具。</p></details>
+      </div>
+      <div class="guide-links"><a href="#app">回到上方，选择玩法 ↑</a><a href="https://github.com/winluckybird/halloween-bingo-game" rel="noopener noreferrer" target="_blank">查看 MIT 开源项目 ↗</a></div>
+    </section>
     <footer class="site-footer"><span>✦ 一点魔法，满场好心情 ✦</span><span>公平随机 · 同轮并列 · 纯装饰奖励</span></footer>
   </div>
   <div id="toast" role="status" aria-live="polite"></div>

@@ -4,6 +4,8 @@
 
 - `midnight.png`：1672×941，紫色月夜、鬼屋、灯笼与南瓜背景，中央留暗色操作区。
 - `symbols.png`：1536×1024，6 列×4 行的透明图集，顺序与 `src/rules.js` 的 `SYMBOLS` 一致。图像具有透明 alpha；部分查看器可能仍显示透明像素下的 RGB 背景。
+- `midnight.webp`、`symbols.webp`：上述 PNG 的运行时压缩版本，尺寸与图集定位保持一致，图集保留透明通道；背景质量 82、图集质量 90。CSS 和 LittleJS 使用 WebP，合计 618,432 字节，比原 PNG 合计减少约 87%。原 PNG 保留作为美术源文件。
+- `social-preview.png`：1200×630 分享封面，使用已有背景、图集及 HTML/CSS 排版渲染，不包含私人房间或玩家信息。设置 `SITE_URL` 后用于 Open Graph 和 Twitter Card 分享预览。
 - `ART-PROMPTS.md`：背景、图集及透明背景修整使用的提示。
 
 CSS 通过图集定位与轻微裁切避免邻格边缘串入。免费格的南瓜灯使用系统 emoji，数字球、卡框与文字为可缩放的页面元素，不写死在背景图片中。

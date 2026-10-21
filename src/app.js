@@ -7,7 +7,8 @@ let token=store.get('hb-token',''),profile=null,room=null,selectedMode=store.get
 let settings=store.get('hb-settings',{sound:true,reduced:matchMedia('(prefers-reduced-motion: reduce)').matches});
 let offset=0,lastSequence=0,serverId='',viewKey='',lastCall='',lastLine=0,lastEmote='',online=true,polling=false,toastTimer,busy=false;
 let stampFeedback=null;
-const pending=new Set();const invitation=new URLSearchParams(location.search).get('room');
+const pending=new Set();let invitation=new URLSearchParams(location.search).get('room');
+const homeTitle=document.title;
 const emoteText=['好耶！🎉','差一点！🥹','一起加油 💪','南瓜笑脸 🎃'];
 function icon(id,cls=''){return `<i class="symbol ${cls}" style="--sx:${(id%6)*20}%;--sy:${[4.6875,36.458333,68.75,100][Math.floor(id/6)]}%" aria-hidden="true"></i>`;}
 function visual(id,mode,cls=''){if(id===FREE)return `<span class="pumpkin ${cls}" aria-hidden="true">🎃</span>`;if(mode==='numbers')return `<span class="number-ball col-${Math.floor(id/15)} ${cls}"><small>${'BINGO'[Math.floor(id/15)]}</small><b>${id+1}</b></span>`;return icon(id,cls);}
@@ -113,6 +114,19 @@ function showResult(){
 function render(){
   if(!profile)return;
   const kind=!room?'home':room.status==='waiting'?'lobby':'game';
+  if(room){
+    invitation=null;
+    const target=`/play?room=${room.code}`;
+    if(location.pathname+location.search!==target)history.replaceState(null,'',target);
+  }else if(!invitation&&(location.pathname==='/play'||new URLSearchParams(location.search).has('room'))){history.replaceState(null,'','/');}
+  const privatePage=Boolean(room||invitation);
+  document.title=privatePage?(kind==='lobby'?'好友房间':kind==='game'?'正在游戏':'加入朋友房')+'｜Halloween Bingo':homeTitle;
+  document.querySelector('meta[name="robots"]').content=privatePage?'noindex,follow':'index,follow';
+  if(privatePage)document.body.dataset.private='true';else delete document.body.dataset.private;
+  const siteUrl=document.querySelector('meta[name="site-url"]')?.content;
+  let canonical=document.querySelector('link[rel="canonical"]');
+  if(privatePage)canonical?.remove();
+  else if(siteUrl&&!canonical){canonical=document.createElement('link');canonical.rel='canonical';canonical.href=siteUrl;document.head.append(canonical);}
   const key=`${kind}:${room?.code||''}:${room?.gameId||''}:${kind==='home'?selectedMode:''}:${kind==='lobby'?JSON.stringify([room.mode,room.host,room.players]):''}`;
   document.body.dataset.screen=kind;
   if(key!==viewKey){viewKey=key;if(kind==='home')renderHome();else if(kind==='lobby')renderLobby();else{lastCall='';lastLine=0;gameMarkup();}}
@@ -167,7 +181,7 @@ document.addEventListener('click',async event=>{
     if(room)await action('mode',{mode:selectedMode});else{const nick=$('#nickname')?.value,avatar=document.querySelector('[name=avatar]:checked')?.value;viewKey='';render();if(nick)$('#nickname').value=nick;if(avatar)document.querySelector('[name=avatar][value="'+avatar+'"]').checked=true;}return;
   }
   if(name==='create'||name==='practice'){
-    try{await saveIdentity();await action(name,{mode:selectedMode});if(room&&invitation)history.replaceState(null,'','/');}catch(e){toast(e.message);}return;
+    try{await saveIdentity();await action(name,{mode:selectedMode});}catch(e){toast(e.message);}return;
   }
   if(name==='join-dialog'){
     try{await saveIdentity();openModal('加入朋友的派对',`<p class="modal-sub">输入朋友分享的 6 位房间码</p><form id="join-form"><label for="join-code">房间码</label><input id="join-code" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" required placeholder="例如 384621" value="${escape(invitation||'')}"><button class="primary full" type="submit">加入派对 →</button></form>`);$('#join-code').focus();}catch(e){toast(e.message);}return;
@@ -184,7 +198,7 @@ document.addEventListener('click',async event=>{
   if(name==='emote'){if(await action('emote',{emote:Number(button.dataset.emote)}))toast('表情已送到伙伴身边');return;}
   if(name==='buy'){if(await action('buy',{item:button.dataset.item})){showShop();toast('装饰已更新');}return;}
   if(name==='invite'){
-    const url=`${location.origin}/?room=${room.code}`;
+    const url=`${location.origin}/play?room=${room.code}`;
     try{await navigator.clipboard.writeText(`来参加 Halloween Bingo！房间码：${room.code}\n${url}`);toast('邀请已复制，发给你的捣蛋鬼朋友吧');}catch{openModal('邀请朋友',`<p>房间码：<b>${room.code}</b></p><input readonly value="${escape(url)}" aria-label="邀请链接"><p class="fine-print">复制链接或分享房间码。朋友需要能访问此服务器地址。</p>`);}return;
   }
 });
@@ -194,7 +208,7 @@ document.addEventListener('change',event=>{
 });
 document.addEventListener('submit',async event=>{
   if(event.target.id!=='join-form')return;event.preventDefault();const code=$('#join-code').value.trim();if(!/^\d{6}$/.test(code)){toast('请输入 6 位房间码');return;}
-  const result=await action('join',{room:code});if(result){modal.close();history.replaceState(null,'',`/?room=${code}`);}
+  const result=await action('join',{room:code});if(result){modal.close();}
 });
 modal.addEventListener('click',event=>{if(event.target===modal){const rect=modal.getBoundingClientRect();if(event.clientX<rect.left||event.clientX>rect.right||event.clientY<rect.top||event.clientY>rect.bottom)modal.close();}});
 document.querySelector('.brand').addEventListener('click',event=>{event.preventDefault();if(room){document.querySelector('[data-action="exit-dialog"]')?.click();if(room.status==='waiting')action('leave');}else{viewKey='';render();}});

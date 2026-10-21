@@ -68,16 +68,33 @@ npm run dev
 
 刷新、网络重连与进程重启均恢复原有截止时间；服务器停机期间也不自动延长对局。身份凭证存储于当前浏览器，清除浏览器存储会建立新身份。首版没有账号跨设备登录、公开匹配或生产级多进程存储；运行一个权威 Node 进程。
 
-## 检查
+## SEO 与公开部署
+
+首页的游戏介绍、双模式规则和常见问题直接包含在 HTML 中，关闭 JavaScript 也能阅读。进入房间或对局后会切换至 `/play?room=房间码` 并隐藏介绍区；新旧邀请链接均可使用。服务器对 `/play`、带 `room` 参数的旧首页链接和 API 返回不收录指令；房间页面的 `noindex` 不依赖前端脚本。`robots.txt` 保持房间 URL 可抓取，让搜索引擎读取该指令。
+
+公开部署时，使用真实域名设置 `SITE_URL`（以下域名仅作示例，必须替换）：
+
+```powershell
+$env:SITE_URL="https://bingo.example.com"
+npm run dev
+```
+
+`SITE_URL` 只接受不含路径、查询参数或凭据的 HTTP(S) 根地址。配置后，公开首页输出 canonical，分享预览使用绝对图片地址，`/sitemap.xml` 只列公开首页，`/robots.txt` 声明站点地图位置。未配置时不猜测域名，也不从请求 Host 生成网址；不输出 canonical、分享绝对图片地址或站点地图声明，访问 `/sitemap.xml` 返回 404。此变量不会自动部署网站、配置 HTTPS 或开放端口。
+
+分享封面位于 `assets/social-preview.png`（1200×630）。运行时背景与图集使用 WebP，合计约 0.62 MB，比原 PNG 合计约 4.8 MB 减少约 87%；原 PNG 仍作为美术源文件保留。英文 README 不代表游戏界面或网页已有英文版。
+
+## 检查与验证
 
 ```powershell
 npm run check
 npm test
 ```
 
-19 项自动测试覆盖随机卡片合法性、数字列范围、完整时间线、双模式开奖和轮询不自动标记、补点归属、一次多线、同轮并列、事件与截止边界、退出/断线、隐私、房间容量、奖励幂等和落盘恢复。HTTP 集成测试使用独立客户端与可控测试时钟，正式服务没有修改开奖或加速时间的接口。
+24 项自动测试覆盖随机卡片合法性、数字列范围、完整时间线、双模式开奖和轮询不自动标记、补点归属、一次多线、同轮并列、事件与截止边界、退出/断线、隐私、房间容量、奖励幂等、落盘恢复，以及静态正文、房间不收录、canonical、分享元数据、站点地图与域名配置边界。HTTP 集成测试使用独立客户端与可控测试时钟，正式服务没有修改开奖或加速时间的接口。
 
 浏览器实测：经典数字开奖与补点、图案模式、24 轮无人获胜结算、刷新恢复；检查了 360×800 与 1440×900 布局。新增双模式实际点击验证：连续开奖不自动盖章、不自动高亮答案；手动点击只增加一格，误点不增加，刷新后保留已确认印章。360×800 下卡片、盖章反馈及最近开奖可在一屏查看。未进行跨公网或真实高延迟网络压测。
+
+SEO 更新另验证了无 JavaScript 阅读、旧邀请加入、进入对局和离开后的 URL/索引状态恢复、WebP 显示，以及手机对局内介绍区隐藏。搜索引擎的实际收录需在正式部署后验证，本地检查不等于已收录。
 
 ## 文件
 
@@ -87,6 +104,7 @@ npm test
 - `src/style.css`：两套响应式布局。
 - `server/game.mjs`：权威游戏状态机及轮末判定。
 - `server/app.mjs`：身份、房间接口、奖励与持久化。
+- `server/seo.mjs`：域名配置、页面元数据、索引规则、robots 与站点地图。
 - `scripts/serve.mjs`：服务入口。
 - `tests/`：规则与真实 HTTP 接口测试。
 - `assets/`：生成的月夜背景、24 图案透明图集及生成提示。
@@ -173,16 +191,33 @@ The server saves player identities, candy, decorations, rooms, and current games
 
 Refreshing, reconnecting, or restarting the process restores the original deadlines. Server downtime does not extend the game. Player credentials are stored in the current browser; clearing browser storage creates a new identity. This version uses one authoritative Node.js process and does not include cross-device accounts, public matchmaking, or production multi-process storage.
 
-### Validation
+### SEO and public deployment
+
+Game descriptions, both modes, rules, and FAQs are included in the initial HTML and remain readable without JavaScript. Rooms and games use `/play?room=CODE`, with the introduction hidden during play. Both new and legacy invitation links work. The server sends `noindex` for `/play`, legacy homepage URLs containing a `room` parameter, and API responses. Private-page indexing rules do not depend on JavaScript. Room URLs remain crawlable in `robots.txt` so crawlers can read their `noindex` directives.
+
+For a public deployment, set `SITE_URL` to your real origin. Replace this example domain:
+
+```powershell
+$env:SITE_URL="https://bingo.example.com"
+npm run dev
+```
+
+Only HTTP(S) root origins without paths, credentials, query strings, or fragments are accepted. When configured, the public homepage receives a canonical URL, sharing metadata uses an absolute cover image URL, `/sitemap.xml` lists only the public homepage, and `/robots.txt` advertises the sitemap. Without `SITE_URL`, the server does not guess a domain or trust the request Host: canonical and absolute sharing image URLs are omitted, no sitemap is advertised, and `/sitemap.xml` returns 404. Setting the variable does not deploy the site, configure HTTPS, or open a port.
+
+The sharing cover is `assets/social-preview.png` (1200×630). Runtime background and atlas images use WebP, totaling approximately 0.62 MB instead of 4.8 MB for the original PNGs, a reduction of about 87%. Original PNG sources are retained. The English README does not provide an English game interface or localized website.
+
+### Checks and validation
 
 ```sh
 npm run check
 npm test
 ```
 
-The 19 automated tests cover legal card generation, number column ranges, complete timelines, absence of automatic marking in both modes, catch-up round attribution, multiple lines from one stamp, shared wins, event and deadline boundaries, leaving and disconnection, privacy, room capacity, reward idempotency, and persistence recovery. HTTP integration tests use independent clients and a controlled test clock. The production server has no draw-editing or time-acceleration interface.
+The 24 automated tests cover legal card generation, number column ranges, complete timelines, absence of automatic marking in both modes, catch-up round attribution, multiple lines from one stamp, shared wins, event and deadline boundaries, leaving and disconnection, privacy, room capacity, reward idempotency, persistence recovery, static content, private-page indexing rules, canonical URLs, sharing metadata, sitemaps, and domain configuration boundaries. HTTP integration tests use independent clients and a controlled test clock. The production server has no draw-editing or time-acceleration interface.
 
 Browser checks covered both modes, catch-up marking, a 24-round game with no winner, refresh recovery, and layouts at 360×800 and 1440×900. Manual-interaction checks verified that draws do not stamp or highlight answers, one valid click stamps one space, incorrect clicks do not add stamps, and confirmed stamps survive refresh. On a 360×800 screen, the card, stamp feedback, and recent history fit in one screen. Public-internet and high-latency load testing have not been performed.
+
+SEO browser checks additionally covered reading without JavaScript, joining legacy invitations, restoring public URL/indexing state after leaving, WebP rendering, and hiding the introduction during mobile play. Actual search indexing must be checked after public deployment; local checks do not establish that the site has been indexed.
 
 ### Project layout
 
@@ -194,6 +229,7 @@ Browser checks covered both modes, catch-up marking, a 24-round game with no win
 | `src/style.css` | Mobile and desktop layouts |
 | `server/game.mjs` | Authoritative game state machine and round-end results |
 | `server/app.mjs` | Identity, room APIs, rewards, persistence |
+| `server/seo.mjs` | Public origin, page metadata, indexing rules, robots, sitemap |
 | `scripts/serve.mjs` | Server entry point |
 | `tests/` | Rule and HTTP integration tests |
 | `assets/` | Generated background, 24-icon atlas, art prompts |

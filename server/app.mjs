@@ -5,11 +5,13 @@ import {dirname,resolve,extname,sep} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {SHOP,AVATARS,completedLines} from '../src/rules.js';
 import {newRoom,playerFor,startGame,advance,markItem,quitGame,publicRoom} from './game.mjs';
+import {normalizeSiteUrl,pageHtml,robotsTxt,sitemapXml} from './seo.mjs';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const mime={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json; charset=utf-8','.png':'image/png','.webp':'image/webp','.jpg':'image/jpeg','.svg':'image/svg+xml','.woff2':'font/woff2'};
 const day=now=>new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'}).format(now);
 const activeStatus=s=>['countdown','round','event'].includes(s);
-export async function createApp({storeFile=resolve(root,'.data/state.json'),clock=Date.now}={}) {
+export async function createApp({storeFile=resolve(root,'.data/state.json'),clock=Date.now,siteUrl=process.env.SITE_URL||''}={}) {
+  siteUrl=normalizeSiteUrl(siteUrl);
   let db={sessions:{},rooms:{}};
   if(storeFile){try{db=JSON.parse(await readFile(storeFile,'utf8'));}catch(e){if(e.code!=='ENOENT') throw e;}}
   let dirty=false,saving=false,sequence=0,savePromise=Promise.resolve();
@@ -62,6 +64,7 @@ export async function createApp({storeFile=resolve(root,'.data/state.json'),cloc
     try{
       const url=new URL(req.url,'http://local');
       if(url.pathname.startsWith('/api/')){
+        res.setHeader('X-Robots-Tag','noindex');
         if(req.headers.origin&&req.headers.origin!==`http://${req.headers.host}`&&req.headers.origin!==`https://${req.headers.host}`)return json({error:'不允许跨站请求'},403);
         const data=req.method==='POST'?await body(req):{};const now=clock();tick(now);
         let token=(req.headers.authorization||'').replace(/^Bearer /,'');let s=db.sessions[token];
@@ -137,6 +140,18 @@ export async function createApp({storeFile=resolve(root,'.data/state.json'),cloc
         return json({error:'接口不存在'},404);
       }
       if(!['GET','HEAD'].includes(req.method)){res.writeHead(405).end();return;}
+      if(url.pathname==='/index.html') {res.writeHead(308,{Location:'/'+url.search});res.end();return;}
+      if(url.pathname==='/robots.txt') {
+        res.writeHead(200,{'Content-Type':'text/plain; charset=utf-8','Cache-Control':'public,max-age=300'});res.end(req.method==='HEAD'?undefined:robotsTxt(siteUrl));return;
+      }
+      if(url.pathname==='/sitemap.xml') {
+        if(!siteUrl){res.writeHead(404,{'X-Robots-Tag':'noindex'}).end('Sitemap unavailable until SITE_URL is configured');return;}
+        res.writeHead(200,{'Content-Type':'application/xml; charset=utf-8','Cache-Control':'public,max-age=300'});res.end(req.method==='HEAD'?undefined:sitemapXml(siteUrl));return;
+      }
+      if(url.pathname==='/'||url.pathname==='/play') {
+        const {html,robots}=pageHtml(await readFile(resolve(root,'index.html'),'utf8'),url,siteUrl);
+        res.writeHead(200,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store','X-Robots-Tag':robots});res.end(req.method==='HEAD'?undefined:html);return;
+      }
       const pathname=decodeURIComponent(url.pathname);const parts=pathname.split(/[\\/]/);
       if(parts.some(x=>x.startsWith('.')||['upstream','logs','scripts','server','tests','node_modules'].includes(x))){res.writeHead(403).end('Forbidden');return;}
       let path=resolve(root,'.'+pathname);if(path!==root&&!path.startsWith(root+sep)){res.writeHead(403).end();return;}

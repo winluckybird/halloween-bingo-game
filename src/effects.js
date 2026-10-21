@@ -13,4 +13,4 @@ function render(){
   for(const p of particles)if(p.candy)drawTile(vec2(p.x,p.y),vec2(.65),tile(10,256));else drawCircle(vec2(p.x,p.y),.07,p.color);
 }
 setShowSplashScreen(false);setCanvasMaxSize(vec2(4096,4096));setTouchGamepadEnable(false);setTouchInputEnable(false);setInputPreventDefault(false);
-engineInit(()=>{},update,()=>{},render,()=>{},['/assets/symbols.png'],document.getElementById('ambient')).catch(console.error);
+engineInit(()=>{},update,()=>{},render,()=>{},['/assets/symbols.webp'],document.getElementById('ambient')).catch(console.error);
